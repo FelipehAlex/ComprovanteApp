@@ -1,0 +1,192 @@
+@page "/comprovantes"
+@model ComprovantesApp.Pages.Comprovantes.IndexModel
+@{
+    ViewData["Title"] = "Comprovantes";
+    ViewData["Ativo"] = "comprovantes";
+
+    string BadgeClasse(StatusComprovante status) => status switch
+    {
+        StatusComprovante.Recebido => "bg-secondary",
+        StatusComprovante.EmValidacao => "bg-info text-dark",
+        StatusComprovante.Validado => "bg-primary",
+        StatusComprovante.ComInconsistencia => "bg-danger",
+        StatusComprovante.IntegradoAoErp => "bg-success",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="m-0">Comprovantes</h2>
+    <a class="btn btn-primary" href="/Comprovantes/Editar">+ Novo comprovante</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small">Fornecedor</label>
+                    <select asp-for="Filtro.FornecedorId" class="form-select form-select-sm">
+                        <option value="">Todos</option>
+                        @foreach (var fornecedor in Model.Fornecedores)
+                        {
+                            <option value="@fornecedor.Id">@fornecedor.Nome</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">Número do documento</label>
+                    <input asp-for="Filtro.NumeroDocumento" class="form-control form-control-sm" placeholder="Ex: NF-1001" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">Status</label>
+                    <select asp-for="Filtro.Status" class="form-select form-select-sm">
+                        <option value="">Todos</option>
+                        @foreach (StatusComprovante status in Enum.GetValues<StatusComprovante>())
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">Emissão de</label>
+                    <input asp-for="Filtro.EmissaoDe" type="date" class="form-control form-control-sm" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">Emissão até</label>
+                    <input asp-for="Filtro.EmissaoAte" type="date" class="form-control form-control-sm" />
+                </div>
+                <div class="col-md-1 d-grid">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Filtrar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle bg-white">
+        <thead class="table-light">
+            <tr>
+                <th>Código</th>
+                <th>Número</th>
+                <th>Fornecedor</th>
+                <th>Emissão</th>
+                <th>Vencimento</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th class="text-end">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model.Comprovantes)
+            {
+                <tr>
+                    <td>#@c.Id</td>
+                    <td>@c.NumeroDocumento</td>
+                    <td>@c.Fornecedor?.Nome</td>
+                    <td>@c.DataEmissao.ToString("dd/MM/yyyy")</td>
+                    <td>@c.DataVencimento.ToString("dd/MM/yyyy")</td>
+                    <td>@c.Valor.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</td>
+                    <td><span class="badge @BadgeClasse(c.Status)">@c.Status</span></td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a class="btn btn-outline-secondary"
+                               href="/Comprovantes/Historico/@c.Id">Histórico</a>
+
+                            @if (c.Status != StatusComprovante.IntegradoAoErp)
+                            {
+                                <a class="btn btn-outline-secondary" href="/Comprovantes/Editar/@c.Id">Editar</a>
+                            }
+
+                            @if (c.Status is StatusComprovante.Recebido or StatusComprovante.EmValidacao or StatusComprovante.ComInconsistencia)
+                            {
+                                <form method="post" asp-page-handler="Validar" asp-route-id="@c.Id" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-primary">Validar</button>
+                                </form>
+                                <a class="btn btn-outline-warning" href="/Comprovantes/Inconsistencia/@c.Id">Inconsistência</a>
+                            }
+
+                            @if (c.Status == StatusComprovante.Validado)
+                            {
+                                <form method="post" asp-page-handler="Integrar" asp-route-id="@c.Id" id="form-integrar-@c.Id" class="d-inline">
+                                    <button type="button" class="btn btn-outline-success"
+                                            data-bs-toggle="modal" data-bs-target="#confirmActionModal"
+                                            data-form-id="form-integrar-@c.Id"
+                                            data-message="Integrar este comprovante ao ERP?"
+                                            data-confirm-label="Integrar" data-confirm-classe="btn-success">
+                                        Integrar
+                                    </button>
+                                </form>
+                            }
+
+                            @if (c.Status == StatusComprovante.Recebido)
+                            {
+                                <form method="post" asp-page-handler="Excluir" asp-route-id="@c.Id" id="form-excluir-@c.Id" class="d-inline">
+                                    <button type="button" class="btn btn-outline-danger"
+                                            data-bs-toggle="modal" data-bs-target="#confirmActionModal"
+                                            data-form-id="form-excluir-@c.Id"
+                                            data-message="Excluir este comprovante? Essa ação não pode ser desfeita."
+                                            data-confirm-label="Excluir" data-confirm-classe="btn-danger">
+                                        Excluir
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+
+            @if (!Model.Comprovantes.Any())
+            {
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">Nenhum comprovante encontrado com esses filtros.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar ação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmActionMessage" class="m-0"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmActionButton" class="btn"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const confirmModalEl = document.getElementById('confirmActionModal');
+        const confirmMessage = document.getElementById('confirmActionMessage');
+        const confirmButton = document.getElementById('confirmActionButton');
+
+        confirmModalEl.addEventListener('show.bs.modal', function (event) {
+            const gatilho = event.relatedTarget;
+            const formId = gatilho.getAttribute('data-form-id');
+            const mensagem = gatilho.getAttribute('data-message');
+            const label = gatilho.getAttribute('data-confirm-label');
+            const classe = gatilho.getAttribute('data-confirm-classe');
+
+            confirmMessage.textContent = mensagem;
+            confirmButton.textContent = label;
+            confirmButton.className = 'btn ' + classe;
+            confirmButton.setAttribute('data-form-id', formId);
+        });
+
+        confirmButton.addEventListener('click', function () {
+            const formId = confirmButton.getAttribute('data-form-id');
+            document.getElementById(formId).submit();
+        });
+    </script>
+}

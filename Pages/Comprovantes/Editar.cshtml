@@ -1,0 +1,68 @@
+@page "/comprovantes/editar/{id:int?}"
+@model ComprovantesApp.Pages.Comprovantes.EditarModel
+@{
+    ViewData["Title"] = Model.EhEdicao ? "Editar Comprovante" : "Novo Comprovante";
+    ViewData["Ativo"] = "comprovantes";
+}
+
+<h2 class="mb-4">@(Model.EhEdicao ? "Editar Comprovante" : "Novo Comprovante")</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <input type="hidden" asp-for="Comprovante.Id" />
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Comprovante.NumeroDocumento" class="form-label"></label>
+                    <input asp-for="Comprovante.NumeroDocumento" class="form-control" maxlength="30" placeholder="Ex: NF-1001" />
+                    <span asp-validation-for="Comprovante.NumeroDocumento" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Comprovante.FornecedorId" class="form-label"></label>
+                    <select asp-for="Comprovante.FornecedorId" class="form-select">
+                        <option value="">Selecione...</option>
+                        @foreach (var fornecedor in Model.Fornecedores)
+                        {
+                            <option value="@fornecedor.Id">@fornecedor.Nome @(!fornecedor.Ativo ? " (inativo)" : "")</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Comprovante.FornecedorId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Comprovante.DataEmissao" class="form-label"></label>
+                    <input asp-for="Comprovante.DataEmissao" type="date" class="form-control" />
+                    <span asp-validation-for="Comprovante.DataEmissao" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Comprovante.DataVencimento" class="form-label"></label>
+                    <input asp-for="Comprovante.DataVencimento" type="date" class="form-control" />
+                    <span asp-validation-for="Comprovante.DataVencimento" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Comprovante.Valor" class="form-label"></label>
+                    <input asp-for="Comprovante.Valor" type="number" step="0.01" min="0.01" class="form-control" placeholder="0,00" />
+                    <span asp-validation-for="Comprovante.Valor" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Comprovante.Descricao" class="form-label"></label>
+                <textarea asp-for="Comprovante.Descricao" class="form-control" rows="3" maxlength="500"></textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a href="/Comprovantes" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

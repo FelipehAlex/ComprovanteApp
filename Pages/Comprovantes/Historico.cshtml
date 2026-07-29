@@ -1,0 +1,37 @@
+@page "/comprovantes/historico/{id:int}"
+@model ComprovantesApp.Pages.Comprovantes.HistoricoModel
+@{
+    ViewData["Title"] = "Histórico do Comprovante";
+    ViewData["Ativo"] = "comprovantes";
+}
+
+<h2 class="mb-1">Histórico do Comprovante</h2>
+@if (Model.Comprovante is not null)
+{
+    <p class="text-muted mb-4">
+        #@Model.Comprovante.Id - @Model.Comprovante.NumeroDocumento (@Model.Comprovante.Fornecedor?.Nome)
+    </p>
+}
+
+<ul class="list-group mb-4">
+    @foreach (var h in Model.Historicos)
+    {
+        <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+                <strong>@h.Acao</strong>
+                <span class="text-muted small">@h.DataHora.ToString("dd/MM/yyyy HH:mm")</span>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(h.Descricao))
+            {
+                <div class="text-muted">@h.Descricao</div>
+            }
+        </li>
+    }
+
+    @if (!Model.Historicos.Any())
+    {
+        <li class="list-group-item text-center text-muted">Nenhum registro de histórico ainda.</li>
+    }
+</ul>
+
+<a href="/Comprovantes" class="btn btn-outline-secondary">&laquo; Voltar</a>

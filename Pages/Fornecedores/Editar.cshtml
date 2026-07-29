@@ -1,0 +1,51 @@
+@page "/fornecedores/editar/{id:int?}"
+@model ComprovantesApp.Pages.Fornecedores.EditarModel
+@{
+    ViewData["Title"] = Model.EhEdicao ? "Editar Fornecedor" : "Novo Fornecedor";
+    ViewData["Ativo"] = "fornecedores";
+}
+
+<h2 class="mb-4">@(Model.EhEdicao ? "Editar Fornecedor" : "Novo Fornecedor")</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <input type="hidden" asp-for="Fornecedor.Id" />
+
+            <div class="mb-3">
+                <label asp-for="Fornecedor.Nome" class="form-label"></label>
+                <input asp-for="Fornecedor.Nome" class="form-control" placeholder="Nome do fornecedor" />
+                <span asp-validation-for="Fornecedor.Nome" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Fornecedor.Cnpj" class="form-label"></label>
+                <input asp-for="Fornecedor.Cnpj" class="form-control" placeholder="00.000.000/0000-00" />
+                <span asp-validation-for="Fornecedor.Cnpj" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Fornecedor.TipoFornecedor" class="form-label"></label>
+                <select asp-for="Fornecedor.TipoFornecedor" class="form-select">
+                    <option value="@ComprovantesApp.Models.Enums.TipoFornecedor.Hotel">Hotel</option>
+                    <option value="@ComprovantesApp.Models.Enums.TipoFornecedor.Fornecedor">Fornecedor</option>
+                </select>
+            </div>
+
+            @if (Model.EhEdicao)
+            {
+                <div class="form-check mb-3">
+                    <input asp-for="Fornecedor.Ativo" class="form-check-input" />
+                    <label asp-for="Fornecedor.Ativo" class="form-check-label"></label>
+                </div>
+            }
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a href="/Fornecedores" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+@page "/fornecedores"
+@model ComprovantesApp.Pages.Fornecedores.IndexModel
+@{
+    ViewData["Title"] = "Fornecedores";
+    ViewData["Ativo"] = "fornecedores";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="m-0">Fornecedores</h2>
+    <a class="btn btn-primary" href="/Fornecedores/Editar">+ Novo fornecedor</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle bg-white">
+        <thead class="table-light">
+            <tr>
+                <th>Nome</th>
+                <th>CNPJ</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th class="text-end">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var fornecedor in Model.Fornecedores)
+            {
+                <tr>
+                    <td>@fornecedor.Nome</td>
+                    <td>@fornecedor.Cnpj</td>
+                    <td>@fornecedor.TipoFornecedor</td>
+                    <td>
+                        @if (fornecedor.Ativo)
+                        {
+                            <span class="badge bg-success">Ativo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inativo</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" href="/Fornecedores/Editar/@fornecedor.Id">Editar</a>
+
+                        @if (fornecedor.Ativo)
+                        {
+                            <form method="post" asp-page-handler="Inativar" asp-route-id="@fornecedor.Id" id="form-inativar-@fornecedor.Id" class="d-inline">
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        data-bs-toggle="modal" data-bs-target="#confirmActionModal"
+                                        data-form-id="form-inativar-@fornecedor.Id"
+                                        data-message="Inativar este fornecedor?"
+                                        data-confirm-label="Inativar" data-confirm-classe="btn-danger">
+                                    Inativar
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-page-handler="Ativar" asp-route-id="@fornecedor.Id" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                    Ativar
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+
+            @if (!Model.Fornecedores.Any())
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">Nenhum fornecedor cadastrado.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar ação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmActionMessage" class="m-0"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmActionButton" class="btn"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const confirmModalEl = document.getElementById('confirmActionModal');
+        const confirmMessage = document.getElementById('confirmActionMessage');
+        const confirmButton = document.getElementById('confirmActionButton');
+
+        confirmModalEl.addEventListener('show.bs.modal', function (event) {
+            const gatilho = event.relatedTarget;
+            const formId = gatilho.getAttribute('data-form-id');
+            const mensagem = gatilho.getAttribute('data-message');
+            const label = gatilho.getAttribute('data-confirm-label');
+            const classe = gatilho.getAttribute('data-confirm-classe');
+
+            confirmMessage.textContent = mensagem;
+            confirmButton.textContent = label;
+            confirmButton.className = 'btn ' + classe;
+            confirmButton.setAttribute('data-form-id', formId);
+        });
+
+        confirmButton.addEventListener('click', function () {
+            const formId = confirmButton.getAttribute('data-form-id');
+            document.getElementById(formId).submit();
+        });
+    </script>
+}

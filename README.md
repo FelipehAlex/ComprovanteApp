@@ -40,9 +40,6 @@ dotnet run
 A aplicação fica disponível em `http://localhost:5000`, já com os dados de exemplo carregados.
 
 ## Arquitetura
-
-Razor Pages foi escolhido no lugar de uma Web API separada por se tratar de uma aplicação com poucas telas e sem necessidade de atender outro tipo de cliente. Cada ação de negócio (validar, marcar inconsistência, integrar, excluir) é um handler de página, sem dependência de JavaScript além das confirmações de ação (ver abaixo).
-
 As regras de negócio ficam isoladas em `Services` (`FornecedorService`, `ComprovanteService`), injetados por interface. As páginas apenas chamam o service correspondente e tratam o resultado.
 
 Outros pontos:

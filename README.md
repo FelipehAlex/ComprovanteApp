@@ -81,5 +81,5 @@ dotnet ef database update
 
 - Testes automatizados das regras de negócio.
 - Paginação na listagem de comprovantes.
-- Autenticação (ex.: JWT) e registro do usuário responsável por cada ação.
+- Autenticação e registro do usuário responsável por cada ação.
 - Controle de concorrência otimista (RowVersion).

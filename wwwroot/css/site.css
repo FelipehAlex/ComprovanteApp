@@ -9,3 +9,13 @@ body {
 .table td, .table th {
     vertical-align: middle;
 }
+
+.table .badge {
+    font-weight: 600;
+    padding: 0.4em 0.75em;
+    border-radius: 50rem;
+}
+
+.dropdown-item i {
+    width: 1rem;
+}

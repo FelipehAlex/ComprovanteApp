@@ -39,28 +39,32 @@
                         }
                     </td>
                     <td class="text-end">
-                        <a class="btn btn-sm btn-outline-secondary" href="/Fornecedores/Editar/@fornecedor.Id">Editar</a>
+                        <div class="d-flex justify-content-end gap-1">
+                            <a class="btn btn-sm btn-outline-secondary" href="/Fornecedores/Editar/@fornecedor.Id">
+                                <i class="bi bi-pencil me-1"></i>Editar
+                            </a>
 
-                        @if (fornecedor.Ativo)
-                        {
-                            <form method="post" asp-page-handler="Inativar" asp-route-id="@fornecedor.Id" id="form-inativar-@fornecedor.Id" class="d-inline">
-                                <button type="button" class="btn btn-sm btn-outline-danger"
-                                        data-bs-toggle="modal" data-bs-target="#confirmActionModal"
-                                        data-form-id="form-inativar-@fornecedor.Id"
-                                        data-message="Inativar este fornecedor?"
-                                        data-confirm-label="Inativar" data-confirm-classe="btn-danger">
-                                    Inativar
-                                </button>
-                            </form>
-                        }
-                        else
-                        {
-                            <form method="post" asp-page-handler="Ativar" asp-route-id="@fornecedor.Id" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-outline-success">
-                                    Ativar
-                                </button>
-                            </form>
-                        }
+                            @if (fornecedor.Ativo)
+                            {
+                                <form method="post" asp-page-handler="Inativar" asp-route-id="@fornecedor.Id" id="form-inativar-@fornecedor.Id">
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal" data-bs-target="#confirmActionModal"
+                                            data-form-id="form-inativar-@fornecedor.Id"
+                                            data-message="Inativar este fornecedor?"
+                                            data-confirm-label="Inativar" data-confirm-classe="btn-danger">
+                                        <i class="bi bi-slash-circle me-1"></i>Inativar
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-page-handler="Ativar" asp-route-id="@fornecedor.Id">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-check-circle me-1"></i>Ativar
+                                    </button>
+                                </form>
+                            }
+                        </div>
                     </td>
                 </tr>
             }

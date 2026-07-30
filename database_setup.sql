@@ -49,3 +49,38 @@ GO
 CREATE INDEX IX_Comprovantes_FornecedorId ON Comprovantes(FornecedorId);
 CREATE INDEX IX_Historicos_ComprovanteId ON Historicos(ComprovanteId);
 GO
+
+-- Fornecedores
+-- TipoFornecedor: 1 = Hotel, 2 = Fornecedor
+INSERT INTO Fornecedores (Nome, Cnpj, TipoFornecedor, Ativo) VALUES
+('Hotel Ipanema Palace', '12.345.678/0001-90', 1, 1),
+('Hotel Serra Verde', '23.456.789/0001-01', 1, 1),
+('Transportadora Rota Certa', '34.567.890/0001-12', 2, 1),
+('Locadora VeloCar', '45.678.901/0001-23', 2, 0);
+GO
+
+-- Comprovantes
+-- Status: 1 = Recebido, 2 = Em validação, 3 = Validado, 4 = Com inconsistência, 5 = Integrado ao ERP
+INSERT INTO Comprovantes
+    (NumeroDocumento, FornecedorId, DataEmissao, DataVencimento, Valor, Descricao, Status, DataCadastro, DataValidacao, DataIntegracao, ObservacaoInconsistencia)
+VALUES
+    ('NF-1001', 1, DATEADD(DAY, -10, GETDATE()), DATEADD(DAY, 5, GETDATE()), 1580.50, 'Hospedagem - evento corporativo', 1, DATEADD(DAY, -10, GETDATE()), NULL, NULL, NULL),
+    ('NF-2002', 2, DATEADD(DAY, -20, GETDATE()), DATEADD(DAY, -5, GETDATE()), 940.00, 'Diárias - visita técnica', 3, DATEADD(DAY, -20, GETDATE()), DATEADD(DAY, -18, GETDATE()), NULL, NULL),
+    ('NF-3003', 3, DATEADD(DAY, -30, GETDATE()), DATEADD(DAY, -15, GETDATE()), 320.75, 'Transporte de equipe', 5, DATEADD(DAY, -30, GETDATE()), DATEADD(DAY, -28, GETDATE()), DATEADD(DAY, -25, GETDATE()), NULL),
+    ('NF-4004', 1, DATEADD(DAY, -3, GETDATE()), DATEADD(DAY, 10, GETDATE()), 210.00, 'Ajuste de diária - valor divergente do contrato', 4, DATEADD(DAY, -3, GETDATE()), NULL, NULL, 'Valor cobrado divergente do contratado com o hotel.');
+GO
+
+-- Histórico
+INSERT INTO Historicos (ComprovanteId, DataHora, Acao, Descricao) VALUES
+(1, DATEADD(DAY, -10, GETDATE()), 'Cadastro', 'Comprovante cadastrado.'),
+
+(2, DATEADD(DAY, -20, GETDATE()), 'Cadastro', 'Comprovante cadastrado.'),
+(2, DATEADD(DAY, -18, GETDATE()), 'Validação', 'Comprovante validado.'),
+
+(3, DATEADD(DAY, -30, GETDATE()), 'Cadastro', 'Comprovante cadastrado.'),
+(3, DATEADD(DAY, -28, GETDATE()), 'Validação', 'Comprovante validado.'),
+(3, DATEADD(DAY, -25, GETDATE()), 'Integração ao ERP', 'Comprovante integrado ao ERP (simulado).'),
+
+(4, DATEADD(DAY, -3, GETDATE()), 'Cadastro', 'Comprovante cadastrado.'),
+(4, DATEADD(DAY, -2, GETDATE()), 'Inconsistência registrada', 'Valor cobrado divergente do contratado com o hotel.');
+GO

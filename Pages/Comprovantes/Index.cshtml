@@ -1,5 +1,7 @@
 @page "/comprovantes"
 @model ComprovantesApp.Pages.Comprovantes.IndexModel
+@using System.ComponentModel.DataAnnotations
+@using System.Reflection
 @{
     ViewData["Title"] = "Comprovantes";
     ViewData["Ativo"] = "comprovantes";
@@ -13,6 +15,13 @@
         StatusComprovante.IntegradoAoErp => "bg-success",
         _ => "bg-secondary"
     };
+
+    string NomeExibicao(StatusComprovante status)
+    {
+        var membro = typeof(StatusComprovante).GetMember(status.ToString())[0];
+        var atributo = membro.GetCustomAttribute<DisplayAttribute>();
+        return atributo?.Name ?? status.ToString();
+    }
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -44,7 +53,7 @@
                         <option value="">Todos</option>
                         @foreach (StatusComprovante status in Enum.GetValues<StatusComprovante>())
                         {
-                            <option value="@status">@status</option>
+                            <option value="@status">@NomeExibicao(status)</option>
                         }
                     </select>
                 </div>
@@ -88,7 +97,7 @@
                     <td>@c.DataEmissao.ToString("dd/MM/yyyy")</td>
                     <td>@c.DataVencimento.ToString("dd/MM/yyyy")</td>
                     <td>@c.Valor.ToString("C2", new System.Globalization.CultureInfo("pt-BR"))</td>
-                    <td><span class="badge @BadgeClasse(c.Status)">@c.Status</span></td>
+                    <td><span class="badge @BadgeClasse(c.Status)">@NomeExibicao(c.Status)</span></td>
                     <td class="text-end">
                         <div class="d-flex justify-content-end gap-1">
                             <a class="btn btn-sm btn-outline-secondary" title="Ver histórico"
@@ -96,65 +105,62 @@
                                 <i class="bi bi-clock-history"></i>
                             </a>
 
-                            @if (c.Status != StatusComprovante.IntegradoAoErp)
-                            {
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary" type="button"
-                                            data-bs-toggle="dropdown" aria-expanded="false" title="Mais ações">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false" title="Mais ações">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                    <li>
+                                        <a class="dropdown-item" href="/Comprovantes/Editar/@c.Id">
+                                            <i class="bi bi-pencil me-2"></i>Editar
+                                        </a>
+                                    </li>
+
+                                    @if (c.Status is StatusComprovante.Recebido or StatusComprovante.EmValidacao or StatusComprovante.ComInconsistencia)
+                                    {
                                         <li>
-                                            <a class="dropdown-item" href="/Comprovantes/Editar/@c.Id">
-                                                <i class="bi bi-pencil me-2"></i>Editar
+                                            <form method="post" asp-page-handler="Validar" asp-route-id="@c.Id">
+                                                <button type="submit" class="dropdown-item">
+                                                    <i class="bi bi-check-lg me-2"></i>Validar
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="/Comprovantes/Inconsistencia/@c.Id">
+                                                <i class="bi bi-exclamation-triangle me-2"></i>Registrar inconsistência
                                             </a>
                                         </li>
+                                    }
 
-                                        @if (c.Status is StatusComprovante.Recebido or StatusComprovante.EmValidacao or StatusComprovante.ComInconsistencia)
-                                        {
-                                            <li>
-                                                <form method="post" asp-page-handler="Validar" asp-route-id="@c.Id">
-                                                    <button type="submit" class="dropdown-item">
-                                                        <i class="bi bi-check-lg me-2"></i>Validar
-                                                    </button>
-                                                </form>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="/Comprovantes/Inconsistencia/@c.Id">
-                                                    <i class="bi bi-exclamation-triangle me-2"></i>Registrar inconsistência
-                                                </a>
-                                            </li>
-                                        }
+                                    @if (c.Status == StatusComprovante.Validado)
+                                    {
+                                        <li>
+                                            <button type="button" class="dropdown-item"
+                                                    data-bs-toggle="modal" data-bs-target="#confirmActionModal"
+                                                    data-form-id="form-integrar-@c.Id"
+                                                    data-message="Integrar este comprovante ao ERP?"
+                                                    data-confirm-label="Integrar" data-confirm-classe="btn-success">
+                                                <i class="bi bi-send me-2"></i>Integrar ao ERP
+                                            </button>
+                                        </li>
+                                    }
 
-                                        @if (c.Status == StatusComprovante.Validado)
-                                        {
-                                            <li>
-                                                <button type="button" class="dropdown-item"
-                                                        data-bs-toggle="modal" data-bs-target="#confirmActionModal"
-                                                        data-form-id="form-integrar-@c.Id"
-                                                        data-message="Integrar este comprovante ao ERP?"
-                                                        data-confirm-label="Integrar" data-confirm-classe="btn-success">
-                                                    <i class="bi bi-send me-2"></i>Integrar ao ERP
-                                                </button>
-                                            </li>
-                                        }
-
-                                        @if (c.Status == StatusComprovante.Recebido)
-                                        {
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li>
-                                                <button type="button" class="dropdown-item text-danger"
-                                                        data-bs-toggle="modal" data-bs-target="#confirmActionModal"
-                                                        data-form-id="form-excluir-@c.Id"
-                                                        data-message="Excluir este comprovante? Essa ação não pode ser desfeita."
-                                                        data-confirm-label="Excluir" data-confirm-classe="btn-danger">
-                                                    <i class="bi bi-trash me-2"></i>Excluir
-                                                </button>
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
-                            }
+                                    @if (c.Status == StatusComprovante.Recebido)
+                                    {
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <button type="button" class="dropdown-item text-danger"
+                                                    data-bs-toggle="modal" data-bs-target="#confirmActionModal"
+                                                    data-form-id="form-excluir-@c.Id"
+                                                    data-message="Excluir este comprovante? Essa ação não pode ser desfeita."
+                                                    data-confirm-label="Excluir" data-confirm-classe="btn-danger">
+                                                <i class="bi bi-trash me-2"></i>Excluir
+                                            </button>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
                         </div>
 
                         @if (c.Status == StatusComprovante.Validado)
@@ -203,7 +209,7 @@
         const confirmMessage = document.getElementById('confirmActionMessage');
         const confirmButton = document.getElementById('confirmActionButton');
 
-        confirmModalEl.addEventListener('show.bs.modal', function (event) {
+        confirmModalEl.addEventListener('show.bs.modal', function(event) {
             const gatilho = event.relatedTarget;
             const formId = gatilho.getAttribute('data-form-id');
             const mensagem = gatilho.getAttribute('data-message');
@@ -216,7 +222,7 @@
             confirmButton.setAttribute('data-form-id', formId);
         });
 
-        confirmButton.addEventListener('click', function () {
+        confirmButton.addEventListener('click', function() {
             const formId = confirmButton.getAttribute('data-form-id');
             document.getElementById(formId).submit();
         });

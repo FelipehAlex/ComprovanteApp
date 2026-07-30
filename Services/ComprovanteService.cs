@@ -165,6 +165,26 @@ namespace ComprovantesApp.Services
             await RegistrarHistoricoAsync(comprovante.Id, "Inconsistência registrada", motivo);
         }
 
+        public async Task CancelarAsync(int id, string motivo)
+        {
+            var comprovante = await _context.Comprovantes.FindAsync(id)
+                ?? throw new RegraDeNegocioException("Comprovante não encontrado.");
+
+            if (comprovante.Status == StatusComprovante.IntegradoAoErp)
+                throw new RegraDeNegocioException("Este comprovante já foi integrado ao ERP e não pode mais ser alterado.");
+
+            if (string.IsNullOrWhiteSpace(motivo))
+                throw new RegraDeNegocioException("Informe o motivo do cancelamento.");
+
+            comprovante.Status = StatusComprovante.Cancelado;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Comprovante {ComprovanteId} cancelado: {Motivo}", id, motivo);
+
+            await RegistrarHistoricoAsync(comprovante.Id, "Cancelamento", motivo);
+        }
+
         public async Task IntegrarAsync(int id)
         {
             var comprovante = await _context.Comprovantes.FindAsync(id)

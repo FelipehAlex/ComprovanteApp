@@ -96,5 +96,26 @@ namespace ComprovantesApp.Pages.Comprovantes
                 Filtro.EmissaoAte
             });
         }
+        public async Task<IActionResult> OnPostCancelarAsync(int id, string motivo)
+        {
+            try
+            {
+                await _comprovanteService.CancelarAsync(id, motivo);
+                TempData["Sucesso"] = "Comprovante cancelado com sucesso.";
+            }
+            catch (RegraDeNegocioException ex)
+            {
+                TempData["Erro"] = ex.Message;
+            }
+
+            return RedirectToPage(new
+            {
+                Filtro.FornecedorId,
+                Filtro.NumeroDocumento,
+                Filtro.Status,
+                Filtro.EmissaoDe,
+                Filtro.EmissaoAte
+            });
+        }
     }
 }

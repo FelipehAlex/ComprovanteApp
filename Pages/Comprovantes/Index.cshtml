@@ -13,6 +13,7 @@
         StatusComprovante.Validado => "bg-primary",
         StatusComprovante.ComInconsistencia => "bg-danger",
         StatusComprovante.IntegradoAoErp => "bg-success",
+        StatusComprovante.Cancelado => "bg-dark",
         _ => "bg-secondary"
     };
 
@@ -156,6 +157,18 @@
                                                     data-message="Excluir este comprovante? Essa ação não pode ser desfeita."
                                                     data-confirm-label="Excluir" data-confirm-classe="btn-danger">
                                                 <i class="bi bi-trash me-2"></i>Excluir
+                                            </button>
+                                        </li>
+                                    }
+                                    @if (c.Status != StatusComprovante.IntegradoAoErp && c.Status != StatusComprovante.Cancelado)
+                                    {
+                                        <li>
+                                            <form method="post" asp-page-handler="Cancelar" asp-route-id="@c.Id" id="form-cancelar-@c.Id">
+                                                <input type="hidden" name="motivo" id="motivo-cancelar-@c.Id" />
+                                            </form>
+                                            <button type="button" class="dropdown-item text-danger"
+                                                    onclick="const m = prompt('Motivo do cancelamento:'); if (m) { document.getElementById('motivo-cancelar-@c.Id').value = m; document.getElementById('form-cancelar-@c.Id').submit(); }">
+                                                <i class="bi bi-x-circle me-2"></i>Cancelar
                                             </button>
                                         </li>
                                     }

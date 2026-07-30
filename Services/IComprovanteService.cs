@@ -16,5 +16,6 @@ namespace ComprovantesApp.Services
         Task ValidarAsync(int id);
         Task MarcarInconsistenciaAsync(int id, string motivo);
         Task IntegrarAsync(int id);
+        Task CancelarAsync(int id, string motivo);
     }
 }

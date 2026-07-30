@@ -13,10 +13,13 @@ namespace ComprovantesApp.Models.Enums
         [Display(Name = "Validado")]
         Validado = 3,
 
-        [Display(Name = "inconsistência")]
+        [Display(Name = "Com inconsistência")]
         ComInconsistencia = 4,
 
         [Display(Name = "Integrado ao ERP")]
         IntegradoAoErp = 5,
+
+        [Display(Name = "Cancelado")]
+        Cancelado = 6,
     }
 }

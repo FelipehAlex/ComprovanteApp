@@ -79,4 +79,4 @@ dotnet ef database update
 - Testes automatizados
 - Paginação na listagem
 - Autenticação e usuário responsável por ação
-- Controle de concorrência (RowVersion)
+- Controle de concorrência

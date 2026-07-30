@@ -112,11 +112,14 @@
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                    <li>
-                                        <a class="dropdown-item" href="/Comprovantes/Editar/@c.Id">
-                                            <i class="bi bi-pencil me-2"></i>Editar
-                                        </a>
-                                    </li>
+                                    @if (c.Status != StatusComprovante.IntegradoAoErp)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" href="/Comprovantes/Editar/@c.Id">
+                                                <i class="bi bi-pencil me-2"></i>Editar
+                                            </a>
+                                        </li>
+                                    }
 
                                     @if (c.Status is StatusComprovante.Recebido or StatusComprovante.EmValidacao or StatusComprovante.ComInconsistencia)
                                     {
@@ -160,6 +163,7 @@
                                             </button>
                                         </li>
                                     }
+
                                     @if (c.Status != StatusComprovante.IntegradoAoErp && c.Status != StatusComprovante.Cancelado)
                                     {
                                         <li>

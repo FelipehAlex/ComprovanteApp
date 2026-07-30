@@ -20,6 +20,6 @@ namespace ComprovantesApp.Models.Enums
         IntegradoAoErp = 5,
 
         [Display(Name = "Cancelado")]
-        Cancelado = 6,
+        Cancelado = 6
     }
 }

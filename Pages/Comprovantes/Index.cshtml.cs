@@ -117,5 +117,6 @@ namespace ComprovantesApp.Pages.Comprovantes
                 Filtro.EmissaoAte
             });
         }
+
     }
 }
